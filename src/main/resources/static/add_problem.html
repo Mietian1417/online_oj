@@ -108,10 +108,10 @@
                     <!-- <h3>Upgrade to Pro Version</h3>
                         <p class="pt-2">
                             We are working on <b>Charcoal Pro</b> which will be released soon. The pro version 
-                            will have a lot more components, sections, icons, plugins and example pages. 
+                            will have ErrorAdvice lot more components, sections, icons, plugins and example pages.
                             Join the waiting list to get notified when we release it (plus discount code).
                         </p>
-                        <a class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</a>
+                        <ErrorAdvice class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</ErrorAdvice>
                         <hr class="my-5"/> -->
                     <p class="pt-2 text-muted">
                         &copy; by czh
@@ -197,8 +197,8 @@
                     "referenceCode": editor3.getValue()
                 },
                 function (result) {
-                    if (result.status !== 1) {
-                        alert(result.data);
+                    if (result.code !== 0) {
+                        alert(result.message);
                     } else {
                         location.assign("problem_list.html");
                     }

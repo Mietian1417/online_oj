@@ -1,4 +1,4 @@
-package com.example.demo.mapper;
+package com.example.demo.dao;
 
 import com.example.demo.model.Problem;
 import org.apache.ibatis.annotations.Mapper;

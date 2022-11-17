@@ -26,6 +26,7 @@ public class SpringWebMvcConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/**/online_oj_login.html")
                 .excludePathPatterns("/**/online_oj_register.html")
                 .excludePathPatterns("/**/login")
-                .excludePathPatterns("/**/register");
+                .excludePathPatterns("/**/register")
+                .excludePathPatterns("/**/test");
     }
 }

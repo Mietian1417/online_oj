@@ -67,7 +67,7 @@
                         <tbody id="problem_list">
                         <!-- <tr>
                             <td>{{id}}</td>
-                            <td><a href="/Question/{{id}}">{{title}}</a></td>
+                            <td><ErrorAdvice href="/Question/{{id}}">{{title}}</ErrorAdvice></td>
                             <td>{{star}}</td>
                         </tr>  -->
                         </tbody>
@@ -86,10 +86,10 @@
                 <!-- <h3>Upgrade to Pro Version</h3>
                 <p class="pt-2">
                     We are working on <b>Charcoal Pro</b> which will be released soon. The pro version
-                    will have a lot more components, sections, icons, plugins and example pages.
+                    will have ErrorAdvice lot more components, sections, icons, plugins and example pages.
                     Join the waiting list to get notified when we release it (plus discount code).
                 </p>
-                <a class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</a>
+                <ErrorAdvice class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</ErrorAdvice>
                 <hr class="my-5"/> -->
                 <p class="pt-2 text-muted">
                     &copy; by czh
@@ -108,7 +108,7 @@
         $.ajax({
             url: "/online_oj/list",
             type: "GET",
-            success: function (result, status) {
+            success: function (result) {
                 if (result.data.isAdmin === 1){
                     let addProblemA = document.createElement('a');
                     addProblemA.href="add_problem.html";
@@ -131,7 +131,7 @@
                     parentNode.insertBefore(deleteProblemA, addNode);
 
                 }
-                getProblemList(result.data.data);
+                getProblemList(result.data.problemList);
             }
         })
     }
@@ -151,7 +151,7 @@
             let a = document.createElement("a");
             a.innerHTML = problem.title;
             a.target = "_blank";
-            a.href = "problem_detail.html?problemID=" + problem.id;
+            a.href = "problem_detail.html?problemId=" + problem.id;
             tr.appendChild(tdTitle);
             tdTitle.appendChild(a);
 

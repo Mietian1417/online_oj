@@ -2,9 +2,8 @@ package com.example.demo.service;
 
 import com.example.demo.model.Answer;
 import com.example.demo.model.Question;
-import com.example.demo.mapper.ProblemMapper;
+import com.example.demo.dao.ProblemMapper;
 import com.example.demo.model.Problem;
-import com.example.demo.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

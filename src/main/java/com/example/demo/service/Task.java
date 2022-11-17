@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.component.FileUtil;
+import com.example.demo.util.FileUtil;
 import com.example.demo.model.Answer;
 import com.example.demo.model.Question;
 
@@ -108,8 +108,8 @@ public class Task {
 //                "        System.out.println(new Solution().add(1 , 2));\n" +
 //                "    }\n" +
 //                "    \n" +
-//                "    public int add(int a, int b){\n" +
-//                "        return a + b;\n" +
+//                "    public int add(int ErrorAdvice, int b){\n" +
+//                "        return ErrorAdvice + b;\n" +
 //                "    }\n" +
 //                "}");
 //        System.out.println(new Task().compileAndRun(question));

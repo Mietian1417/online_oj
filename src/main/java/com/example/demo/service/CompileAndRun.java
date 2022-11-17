@@ -1,6 +1,6 @@
 package com.example.demo.service;
 
-import com.example.demo.component.FileUtil;
+import com.example.demo.util.FileUtil;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

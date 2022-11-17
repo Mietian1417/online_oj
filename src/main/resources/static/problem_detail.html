@@ -55,7 +55,7 @@
                 <div class="jumbotron jumbotron-fluid">
                     <div class="container" id="problemDesc">
                         <!-- <h1>Container fluid size jumbotron</h1>
-                        <p>Think BIG with a Bootstrap Jumbotron!</p> -->
+                        <p>Think BIG with ErrorAdvice Bootstrap Jumbotron!</p> -->
                     </div>
                 </div>
             </div>
@@ -89,7 +89,7 @@
                     <div class="container">
                                 <pre id="problemResult">
                                     <!-- <h1>Container fluid size jumbotron</h1>
-                                    <p>Think BIG with a Bootstrap Jumbotron!</p> -->
+                                    <p>Think BIG with ErrorAdvice Bootstrap Jumbotron!</p> -->
                                 </pre>
                     </div>
                 </div>
@@ -106,10 +106,10 @@
                 <!-- <h3>Upgrade to Pro Version</h3>
                 <p class="pt-2">
                     We are working on <b>Charcoal Pro</b> which will be released soon. The pro version
-                    will have a lot more components, sections, icons, plugins and example pages.
+                    will have ErrorAdvice lot more components, sections, icons, plugins and example pages.
                     Join the waiting list to get notified when we release it (plus discount code).
                 </p>
-                <a class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</a>
+                <ErrorAdvice class="btn btn-warning" href="https://wireddots.com/newsletter">Join Waiting List</ErrorAdvice>
                 <hr class="my-5"/> -->
                 <p class="pt-2 text-muted">
                     &copy; by czh
@@ -150,9 +150,10 @@
         $.ajax({
             url: "/online_oj/detail" + location.search,
             type: "GET",
-            success: function (result, status) {
-                if (result.status === -1) {
-                    alert(result.data);
+            success: function (result) {
+                if (result.code !== 0) {
+                    alert(result.message);
+                    location.assign("problem_list.html");
                     return;
                 }
                 if (result.data.isAdmin === 1){
@@ -177,7 +178,7 @@
                     parentNode.insertBefore(deleteProblemA, addNode);
 
                 }
-                getDetail(result.data.data);
+                getDetail(result.data.problem);
             }
         })
     }
@@ -203,7 +204,7 @@
         let submitButton = document.querySelector("#submitButton");
         submitButton.onclick = function () {
             let body = {
-                problemID: problem.id,
+                problemId: problem.id,
                 // code:writeText.value
                 code: editor.getValue()
             };
@@ -213,16 +214,16 @@
                 type: "POST",
                 // 表单传输
                 data: body,
-                success: function (result, status) {
+                success: function (result) {
                     let problemResult = document.querySelector("#problemResult");
-                    if (result.status === 1) {
+                    if (result.code === 0) {
                         if (result.data.status !== 0) {
                             problemResult.innerHTML = result.data.reason;
                         } else {
                             problemResult.innerHTML = result.data.stdout;
                         }
                     } else {
-                        alert(result.data);
+                        alert(result.message);
                     }
                 }
             });
@@ -236,8 +237,8 @@
             url: "/online_oj/loadLastSubmitCode" + location.search,
             type: "GET",
             success: function (result, status) {
-                if (result.status !== 1) {
-                    alert(result.data);
+                if (result.code !== 0) {
+                    alert(result.message);
                 } else {
                     editor.setValue(result.data);
                 }
@@ -251,8 +252,8 @@
             url: "online_oj/loadReferenceAnswer" + location.search,
             type: "GET",
             success: function (result) {
-                if (result.status !== 1){
-                    alert(result.data);
+                if (result.code !== 0){
+                    alert(result.message);
                 }else{
                     editor.setValue(result.data);
                 }

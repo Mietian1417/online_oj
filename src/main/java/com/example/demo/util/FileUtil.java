@@ -1,4 +1,4 @@
-package com.example.demo.component;
+package com.example.demo.util;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -38,8 +38,4 @@ public class FileUtil {
         }
     }
 
-//    public static void main(String[] args) {
-//        FileUtil.writeFile("./a.txt", "hello world!");
-//        System.out.println(FileUtil.readFile("./a.txt"));
-//    }
 }

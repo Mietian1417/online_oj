@@ -69,10 +69,10 @@
                 "password": password
             },
             function (result) {
-                if (result.status === 1) {
+                if (result.code === 0) {
                     location.assign("online_oj_login.html");
                 } else {
-                    alert(result.data);
+                    alert(result.message);
                 }
             }
         )

@@ -72,10 +72,10 @@
                 "password": password
             },
             function (result) {
-                if (result.status === 1) {
+                if (result.code === 0) {
                     location.assign("problem_list.html");
                 } else {
-                    alert(result.data);
+                    alert(result.message);
                 }
             }
         )

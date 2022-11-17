@@ -12,7 +12,7 @@ import lombok.Data;
 
 @Data
 public class UserSubmitCode {
-    private int userID;
-    private int problemID;
+    private int userId;
+    private int problemId;
     private String submitCode;
 }

@@ -1,16 +1,20 @@
 package com.example.demo.controller;
 
-import com.example.demo.config.AddProblemFailException;
-import com.example.demo.config.NotFoundAnyCodeException;
-import com.example.demo.config.ProblemNotFoundException;
 import com.example.demo.model.Answer;
 import com.example.demo.model.Problem;
-
 import com.example.demo.model.User;
+import com.example.demo.param.GroupSeq;
+import com.example.demo.param.UserParam;
+import com.example.demo.result.ErrorCode;
+import com.example.demo.result.Result;
 import com.example.demo.service.ProblemService;
 import com.example.demo.service.UserService;
+import com.example.demo.vo.IsAdminAndList;
+import com.example.demo.vo.IsAdminAndProblem;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
@@ -18,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -39,160 +42,136 @@ public class ProblemController {
     private UserService userService;
 
     @RequestMapping("/register")
-    public Object register(String username, String password) {
-        HashMap<String, Object> hashMap = new HashMap<>();
+    public Result<String> register(@Validated({GroupSeq.class}) UserParam userParam) {
 
-        if (username == null || "".equals(username) || password == null || "".equals(password)) {
-            hashMap.put("message", "用户名或密码为空! ");
-            hashMap.put("status", -1);
-            return hashMap;
-        }
-
-        User user = userService.selectByName(username);
+        User user = userService.selectByName(userParam.getUsername());
         if (user != null) {
-            hashMap.put("status", -1);
-            hashMap.put("message", "用户名已存在! ");
-            return hashMap;
+            return Result.error(ErrorCode.USER_EXISTS);
         }
-        int ret = userService.addUser(username, password);
+        int ret = userService.addUser(userParam.getUsername(), userParam.getPassword());
         if (ret != 1) {
-            hashMap.put("status", -1);
-            hashMap.put("message", "添加用户失败, 请稍后再试! ");
-            return hashMap;
+            return Result.error(ErrorCode.USER_ADD_FAIL);
         }
-        return 1;
+        return Result.success("");
     }
 
     @RequestMapping("/login")
-    public Object login(String username, String password, HttpServletRequest request) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-        if (username == null || "".equals(username) || password == null || "".equals(password)) {
-            hashMap.put("message", "用户名或密码为空! ");
-            hashMap.put("status", -1);
-            return hashMap;
-        }
+    public Result<String> login(@Validated({GroupSeq.class}) UserParam userParam,
+                                HttpServletRequest request) {
 
-        User user = userService.selectByName(username);
-        if (user == null || !user.getPassword().equals(password)) {
-            hashMap.put("message", "用户名或密码错误! ");
-            hashMap.put("status", -1);
-            return hashMap;
+        User user = userService.selectByName(userParam.getUsername());
+        if (user == null || !user.getPassword().equals(userParam.getPassword())) {
+            return Result.error(ErrorCode.USER_OR_PASSWORD_ERROR);
         }
 
         HttpSession session = request.getSession(true);
         if (session != null) {
             session.setAttribute("user", user);
         }
-
-        return 1;
+        return Result.success("");
     }
 
     @RequestMapping("/logout")
-    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void logout(HttpServletRequest request,
+                       HttpServletResponse response) throws IOException {
         HttpSession session = request.getSession(false);
         session.removeAttribute("user");
         response.sendRedirect("/online_oj_login.html");
     }
 
     @RequestMapping("/list")
-    public HashMap<String, Object> getProblemList(@SessionAttribute("user") User user) {
-        HashMap<String, Object> hashMap = new HashMap<>();
-
-        HashMap<String, Object> message = new HashMap<>();
-        message.put("data", problemService.getProblemList());
-        message.put("isAdmin", user.getIsAdmin());
-
-        hashMap.put("status", 1);
-        hashMap.put("message", message);
-        return hashMap;
+    public Result<IsAdminAndList> getProblemList(@SessionAttribute("user") User user) {
+        List<Problem> problemList = problemService.getProblemList();
+        IsAdminAndList isAdminAndList = new IsAdminAndList();
+        isAdminAndList.setIsAdmin(user.getIsAdmin());
+        isAdminAndList.setProblemList(problemList);
+        return Result.success(isAdminAndList);
     }
 
     @RequestMapping("/detail")
-    public HashMap<String, Object> getDetail(Integer problemID, @SessionAttribute("user") User user) throws ProblemNotFoundException {
-        if (problemID == null || problemID <= 0) {
-            throw new ProblemNotFoundException();
+    public Result<IsAdminAndProblem> getDetail(@RequestParam("problemId") Integer problemId,
+                                               @SessionAttribute("user") User user) {
+        if (problemId == null || problemId <= 0) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", 1);
-
-        HashMap<String, Object> message = new HashMap<>();
-        message.put("data", problemService.getProblemByID(problemID));
-        message.put("isAdmin", user.getIsAdmin());
-
-        hashMap.put("message", message);
-        return hashMap;
+        Problem problem = problemService.getProblemByID(problemId);
+        if (problem == null) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
+        }
+        IsAdminAndProblem isAdminAndProblem = new IsAdminAndProblem();
+        isAdminAndProblem.setIsAdmin(user.getIsAdmin());
+        isAdminAndProblem.setProblem(problem);
+        return Result.success(isAdminAndProblem);
     }
 
     @RequestMapping("/submit")
-    public Answer submitCode(Integer problemID, String code, @SessionAttribute("user") User user) throws ProblemNotFoundException {
-        System.out.println(user.toString());
-        System.out.println(user.toString());
-        System.out.println(user.toString());
-        if (problemID == null || problemID <= 0) {
-            throw new ProblemNotFoundException();
+    public Result<Answer> submitCode(@RequestParam("problemId") Integer problemId,
+                                     @RequestParam("code") String code,
+                                     @SessionAttribute("user") User user) {
+        if (problemId == null || problemId <= 0) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        Problem problem = problemService.getProblemByID(problemID);
+        Problem problem = problemService.getProblemByID(problemId);
         if (problem == null) {
-            throw new ProblemNotFoundException();
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
         String testCode = problem.getTestCode();
-        return problemService.submitAndSaveCode(user.getId(), problemID, testCode, code);
+        Answer answer = problemService.submitAndSaveCode(user.getId(), problemId, testCode, code);
+        return Result.success(answer);
     }
 
     @RequestMapping("/loadLastSubmitCode")
-    public HashMap<String, Object> getLastSubmitCode(Integer problemID, @SessionAttribute("user") User user) throws ProblemNotFoundException, NotFoundAnyCodeException {
-        if (problemID == null || problemID <= 0) {
-            throw new ProblemNotFoundException();
+    public Result<String> getLastSubmitCode(@RequestParam("problemId") Integer problemId,
+                                            @SessionAttribute("user") User user) {
+        if (problemId == null || problemId <= 0) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        Problem problem = problemService.getProblemByID(problemID);
+        Problem problem = problemService.getProblemByID(problemId);
         if (problem == null) {
-            throw new ProblemNotFoundException();
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
-        String lastSubmitCode = userService.getLastSubmitCode(problemID, user.getId());
+        String lastSubmitCode = userService.getLastSubmitCode(problemId, user.getId());
         if (lastSubmitCode == null) {
-            throw new NotFoundAnyCodeException();
+            return Result.error(ErrorCode.USER_NOT_SUBMIT_ANY_CODE);
         }
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", 1);
-        hashMap.put("message", lastSubmitCode);
-        return hashMap;
+        return Result.success(lastSubmitCode);
     }
 
     @RequestMapping("/loadReferenceAnswer")
-    public HashMap<String, Object> getReferenceAnswer(Integer problemID) throws ProblemNotFoundException, NotFoundAnyCodeException {
-        if (problemID == null || problemID <= 0) {
-            throw new ProblemNotFoundException();
+    public Result<String> getReferenceAnswer(@RequestParam("problemId") Integer problemId) {
+        if (problemId == null || problemId <= 0) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        Problem problem = problemService.getProblemByID(problemID);
+        Problem problem = problemService.getProblemByID(problemId);
         if (problem == null) {
-            throw new ProblemNotFoundException();
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        String referenceAnswer = problemService.getReferenceAnswer(problemID);
-
-        HashMap<String, Object> hashMap = new HashMap<>();
-        hashMap.put("status", 1);
-        hashMap.put("message", referenceAnswer);
-        return hashMap;
+        String referenceAnswer = problemService.getReferenceAnswer(problemId);
+        return Result.success(referenceAnswer);
     }
 
     @RequestMapping("/addProblem")
-    public Integer addProblem(String title, String level, String description,
-                              String templateCode, String testCode, String referenceCode) throws AddProblemFailException {
+    public Result<Integer> addProblem(@RequestParam("title") String title,
+                                      @RequestParam("level") String level,
+                                      @RequestParam("description") String description,
+                                      @RequestParam("templateCode") String templateCode,
+                                      @RequestParam("testCode") String testCode,
+                                      @RequestParam("referenceCode") String referenceCode) {
         if (title == null || "".equals(title) ||
-                level == null || "".equals(level) ||
-                description == null || "".equals(description.replaceAll(" ","").replaceAll("\n","")) ||
-                templateCode == null || "".equals(templateCode.replaceAll(" ","").replaceAll("\n","")) ||
-                testCode == null || "".equals(testCode.replaceAll(" ","").replaceAll("\n","")) ||
-                referenceCode == null || "".equals(referenceCode.replaceAll(" ","").replaceAll("\n",""))
+                level == null || "".equals(level)
+                || description == null || "".equals(description.replaceAll(" ", "").replaceAll("\n", ""))
+                || templateCode == null || "".equals(templateCode.replaceAll(" ", "").replaceAll("\n", ""))
+                || testCode == null || "".equals(testCode.replaceAll(" ", "").replaceAll("\n", ""))
+                || referenceCode == null || "".equals(referenceCode.replaceAll(" ", "").replaceAll("\n", ""))
         ) {
-            throw new AddProblemFailException();
+            return Result.error(ErrorCode.SUBMIT_EXISTS_NULL);
+
         }
 
         Problem problem = new Problem();
@@ -202,21 +181,22 @@ public class ProblemController {
         problem.setTemplateCode(templateCode);
         problem.setTestCode(testCode);
         problem.setReferenceCode(referenceCode);
-        return problemService.addProblem(problem.getTitle(), problem.getLevel(), problem.getDescription(),
-                problem.getTemplateCode(), problem.getTestCode(), problem.getReferenceCode());
+        Integer isSuccess = problemService.addProblem(problem.getTitle(), problem.getLevel(),
+                problem.getDescription(), problem.getTemplateCode(),
+                problem.getTestCode(), problem.getReferenceCode());
+        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.DATABASE_OPTION_FAIL);
     }
 
     @RequestMapping("/deleteProblem")
-    public Integer deleteProblem(Integer problemID) throws ProblemNotFoundException {
-        if (problemID == null || problemID <= 0){
-            throw new ProblemNotFoundException();
+    public Result<Integer> deleteProblem(@RequestParam("problemId") Integer problemId) {
+        if (problemId == null || problemId <= 0) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
-        Problem problem = problemService.getProblemByID(problemID);
-        if (problem == null){
-            throw new ProblemNotFoundException();
+        Problem problem = problemService.getProblemByID(problemId);
+        if (problem == null) {
+            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
-        return problemService.deleteProblemByID(problemID);
+        Integer isSuccess = problemService.deleteProblemByID(problemId);
+        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.DATABASE_OPTION_FAIL);
     }
-
-
 }
