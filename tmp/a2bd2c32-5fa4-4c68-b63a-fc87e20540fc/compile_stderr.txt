@@ -1,9 +1,0 @@
-.\tmp\a2bd2c32-5fa4-4c68-b63a-fc87e20540fc\Solution.java:8: 错误: 找不到符号
-        retrun A;
-        ^
-  符号:   类 retrun
-  位置: 类 Solution
-.\tmp\a2bd2c32-5fa4-4c68-b63a-fc87e20540fc\Solution.java:8: 错误: 已在方法 add(int,int)中定义了变量 A
-        retrun A;
-               ^
-2 个错误
