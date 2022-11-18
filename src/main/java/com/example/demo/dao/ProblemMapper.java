@@ -17,12 +17,12 @@ import java.util.List;
 public interface ProblemMapper {
     List<Problem> getProblemList();
 
-    Problem getProblemByID(Integer problemID);
+    Problem getProblemById(Integer problemId);
 
-    String getReferenceAnswer(Integer problemID);
+    String getReferenceAnswer(Integer problemId);
 
     int addProblem(String title, String level, String description,
                    String templateCode, String testCode, String referenceCode);
 
-    Integer deleteProblemByID(Integer problemID);
+    Integer deleteProblemById(Integer problemId);
 }

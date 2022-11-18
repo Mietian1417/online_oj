@@ -17,7 +17,7 @@ public interface UserMapper {
 
     int addUser(String username, String password);
 
-    int saveUserSubmitCode(int userID, int problemID, String submitCode);
+    int saveUserSubmitCode(int userId, int problemId, String submitCode);
 
-    String getLastSubmitCode(Integer problemID, int userID);
+    String getLastSubmitCode(Integer problemId, int userId);
 }

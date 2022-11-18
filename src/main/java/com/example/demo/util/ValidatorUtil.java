@@ -8,6 +8,10 @@ package com.example.demo.util;
  *
  * @author 陈子豪
  */
+
+/**
+ * 工具类, 记录了自定义注解 @PasswordValid 的详细校验规则
+ */
 public class ValidatorUtil {
 
     // 密码规则
@@ -35,7 +39,6 @@ public class ValidatorUtil {
                 isHasOtherSymbols = true;
             }
         }
-        System.out.println("校验--------------------------------------------");
         return isHasNumbers && isHasAlphabet && isHasOtherSymbols;
     }
 }

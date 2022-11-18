@@ -13,8 +13,8 @@ create table user(
 );
 
 insert into user(username, password, is_admin) values
-    ("细雨",123456, 0),
-    ("admin", 1417, 1);
+    ("admin","1417.a", 1),
+    ("细雨", "1417.a", 0);
 
 
 drop table if exists user_submit_code;

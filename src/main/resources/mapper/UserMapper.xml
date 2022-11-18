@@ -9,31 +9,31 @@
         <result column="is_admin" property="isAdmin"></result>
     </resultMap>
 
-<!--    <resultMap id="BaseMap2" type="com.example.demo.model.UserSubmitCode">-->
-<!--        <id column="user_id" property="userID"></id>-->
-<!--        <result column="problem_id" property="problemID"></result>-->
-<!--        <result column="submit_code" property="submitCode"></result>-->
-<!--    </resultMap>-->
+    <resultMap id="BaseMap2" type="com.example.demo.model.UserSubmitCode">
+        <id column="user_id" property="userId"></id>
+        <result column="problem_id" property="problemId"></result>
+        <result column="submit_code" property="submitCode"></result>
+    </resultMap>
 
     <insert id="addUser">
         insert into user(id, username, password) values (null, #{username}, #{password})
     </insert>
 
-<!--    保存用户提交的代码-->
+    <!--    保存用户提交的代码-->
     <insert id="saveUserSubmitCode">
         replace  into user_submit_code(user_id, problem_id, submit_code)
         values
-        (#{userID}, #{problemID}, #{submitCode})
+        (#{userId}, #{problemId}, #{submitCode})
 
     </insert>
 
-<!--    读取用户提交的代码-->
+    <!--    读取用户提交的代码-->
 
     <select id="selectByName" resultMap="BaseMap1">
         select id, username, password, is_admin from user where username = #{username}
     </select>
 
     <select id="getLastSubmitCode" resultType="java.lang.String">
-        select submit_code from user_submit_code where user_id = #{userID} and problem_id = #{problemID}
+        select submit_code from user_submit_code where user_id = #{userId} and problem_id = #{problemId}
     </select>
 </mapper>

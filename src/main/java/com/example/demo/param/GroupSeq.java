@@ -8,7 +8,7 @@ import javax.validation.GroupSequence;
  * 从这个接口参数的左边依次向右边执行
  * 先执行 First, 再 Second,最后 Third
  */
-@GroupSequence({GroupSeq.First.class, GroupSeq.Second.class, GroupSeq.Third.class, GroupSeq.Fourth.class, GroupSeq.Fifth.class})
+@GroupSequence({GroupSeq.First.class, GroupSeq.Second.class, GroupSeq.Third.class, GroupSeq.Fourth.class, GroupSeq.Fifth.class, GroupSeq.Sixth.class})
 public interface GroupSeq {
     interface First {
     }
@@ -25,6 +25,10 @@ public interface GroupSeq {
     }
 
     interface Fifth {
+
+    }
+
+    interface Sixth {
 
     }
 }

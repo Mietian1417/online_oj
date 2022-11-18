@@ -13,6 +13,5 @@ class DemoApplicationTests {
 
     @Test
     void test() {
-
     }
 }

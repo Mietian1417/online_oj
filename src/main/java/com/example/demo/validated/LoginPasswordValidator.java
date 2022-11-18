@@ -14,16 +14,31 @@ import javax.validation.ConstraintValidatorContext;
  *
  * @author 陈子豪
  */
+
+/**
+ * 该类是自定义注解 @PasswordValid 的校验流程
+ */
 public class LoginPasswordValidator implements ConstraintValidator<PasswordValid, String> {
+
     // 是否强制校验
     private boolean required = false;
 
+    /**
+     * 初始化, 对该注解是否可以为空进行传值
+     * @param constraintAnnotation 自定义注解类
+     */
     @Override
     public void initialize(PasswordValid constraintAnnotation) {
-        // 初始化, 对参数是否可以为空进行传值
         required = constraintAnnotation.required();
     }
 
+    /**
+     * 匹配规则
+     * @param value 登录密码
+     * @param constraintValidatorContext 自定义新的错误信息,
+     *                                   由于 @PasswordValid 注解已经约定好了错误信息, 所以该参数不用配置
+     * @return 返回密码是否通过校验
+     */
     @Override
     public boolean isValid(String value, ConstraintValidatorContext constraintValidatorContext) {
         if (required) {

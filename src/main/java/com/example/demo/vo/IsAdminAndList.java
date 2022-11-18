@@ -15,6 +15,9 @@ import java.util.List;
  * @author 陈子豪
  */
 
+/**
+ * vo 类表示返回前端的对象
+ */
 @Setter
 @Getter
 public class IsAdminAndList {

@@ -26,8 +26,8 @@ public class UserService {
         return userMapper.addUser(username, password);
     }
 
-    public int saveUserSubmitCode(int userID, int problemID, String submitCode) {
-        return userMapper.saveUserSubmitCode(userID, problemID, submitCode);
+    public int saveUserSubmitCode(int userId, int problemId, String submitCode) {
+        return userMapper.saveUserSubmitCode(userId, problemId, submitCode);
     }
 
     public String getLastSubmitCode(Integer problemID, int userID) {

@@ -29,11 +29,11 @@ public class ProblemService {
         return problemMapper.getProblemList();
     }
 
-    public Problem getProblemByID(Integer problemID) {
-        return problemMapper.getProblemByID(problemID);
+    public Problem getProblemById(Integer problemId) {
+        return problemMapper.getProblemById(problemId);
     }
 
-    public Answer submitAndSaveCode(int userID, int problemID, String testCode, String code) {
+    public Answer submitAndSaveCode(int userId, int problemId, String testCode, String code) {
 
         String finalCode = merge(testCode, code);
 
@@ -45,14 +45,14 @@ public class ProblemService {
         }
 
 
-        // 运行代码
+        // 执行代码
         Task task = new Task();
         Question question = new Question();
         question.setCode(finalCode);
         Answer answer = task.compileAndRun(question);
         if (answer.getStatus() == 0) {
             // 当用户编译运行没有问题时, 保存(更新)用户当前提交的代码
-            userService.saveUserSubmitCode(userID, problemID, code);
+            userService.saveUserSubmitCode(userId, problemId, code);
         }
         return answer;
     }
@@ -83,15 +83,15 @@ public class ProblemService {
         return false;
     }
 
-    public String getReferenceAnswer(Integer problemID) {
-        return problemMapper.getReferenceAnswer(problemID);
+    public String getReferenceAnswer(Integer problemId) {
+        return problemMapper.getReferenceAnswer(problemId);
     }
 
     public Integer addProblem(String title, String level, String description, String templateCode, String testCode, String referenceCode) {
         return problemMapper.addProblem(title, level, description, templateCode, testCode, referenceCode);
     }
 
-    public Integer deleteProblemByID(Integer problemID) {
-        return problemMapper.deleteProblemByID(problemID);
+    public Integer deleteProblemById(Integer problemId) {
+        return problemMapper.deleteProblemById(problemId);
     }
 }

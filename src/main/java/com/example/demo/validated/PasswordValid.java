@@ -19,6 +19,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * @author 陈子豪
  */
 
+/**
+ * 自定义注解, 对登录密码约束
+ */
 
 @Target({METHOD, FIELD, ANNOTATION_TYPE, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)

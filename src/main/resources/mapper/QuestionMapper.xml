@@ -12,8 +12,8 @@
         <result property="testCode" column="test_code"></result>
         <result property="referenceCode" column="reference_code"></result>
     </resultMap>
-    <delete id="deleteProblemByID">
-        delete from oj_question where id = #{problemID}
+    <delete id="deleteProblemById">
+        delete from oj_question where id = #{problemId}
     </delete>
 
     <!--    获取题目列表-->
@@ -22,13 +22,13 @@
     </select>
 
 <!--    获取题目详情-->
-    <select id="getProblemByID" resultMap="BaseMap">
-        select id, title, level, description, template_code, test_code from oj_question where id = #{problemID}
+    <select id="getProblemById" resultMap="BaseMap">
+        select id, title, level, description, template_code, test_code from oj_question where id = #{problemId}
     </select>
 
 <!--    获取题目的参考答案-->
     <select id="getReferenceAnswer" resultType="java.lang.String">
-        select reference_code from oj_question where id = #{problemID}
+        select reference_code from oj_question where id = #{problemId}
     </select>
 
 <!--    添加题目-->

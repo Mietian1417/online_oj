@@ -10,7 +10,9 @@ import lombok.Data;
  * Time: 19:18
  */
 
-//这个类表示的是 提交的代码
+/**
+ * 这个类表示的是 提交的代码
+ */
 @Data
 public class Question {
     private String code;

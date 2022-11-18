@@ -4,7 +4,12 @@ import com.example.demo.model.Answer;
 import com.example.demo.model.Problem;
 import com.example.demo.model.User;
 import com.example.demo.param.GroupSeq;
+import com.example.demo.param.ProblemParam;
 import com.example.demo.param.UserParam;
+import com.example.demo.redis.ProblemKey;
+import com.example.demo.redis.ProblemsKey;
+import com.example.demo.redis.RedisCacheTime;
+import com.example.demo.redis.RedisService;
 import com.example.demo.result.ErrorCode;
 import com.example.demo.result.Result;
 import com.example.demo.service.ProblemService;
@@ -18,9 +23,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 
@@ -32,14 +42,35 @@ import java.util.List;
  * Time: 9:36
  */
 
+/**
+ * @Validated 开启 controller 参数校验
+ */
 @RequestMapping("/online_oj")
 @RestController
+@Validated
 public class ProblemController {
     @Autowired
     private ProblemService problemService;
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RedisService redisService;
+
+
+    /**
+     * 初始化, 将所有的题目加载到缓存中
+     */
+    @PostConstruct
+    public void loadProblemsToRedis() {
+        List<Problem> problemList = problemService.getProblemList();
+        for (Problem simpleProblem : problemList) {
+            Problem problem = problemService.getProblemById(simpleProblem.getId());
+            redisService.set(ProblemKey.getProblem, problem.getId() + "", problem, RedisCacheTime.DETAIL_PROBLEM_CACHE_TIME);
+        }
+
+    }
 
     @RequestMapping("/register")
     public Result<String> register(@Validated({GroupSeq.class}) UserParam userParam) {
@@ -81,39 +112,56 @@ public class ProblemController {
 
     @RequestMapping("/list")
     public Result<IsAdminAndList> getProblemList(@SessionAttribute("user") User user) {
+        // 查看 redis 是否存在, 存在直接返回
+        IsAdminAndList redisISAdminAndList = redisService.get(ProblemsKey.getProblems, "", IsAdminAndList.class);
+        if (redisISAdminAndList != null) {
+            return Result.success(redisISAdminAndList);
+        }
+
         List<Problem> problemList = problemService.getProblemList();
         IsAdminAndList isAdminAndList = new IsAdminAndList();
         isAdminAndList.setIsAdmin(user.getIsAdmin());
         isAdminAndList.setProblemList(problemList);
+
+        // redis 不存在, 建立缓存
+        redisService.set(ProblemsKey.getProblems, "", isAdminAndList, RedisCacheTime.PROBLEMS_CACHE_TIME);
         return Result.success(isAdminAndList);
     }
 
     @RequestMapping("/detail")
-    public Result<IsAdminAndProblem> getDetail(@RequestParam("problemId") Integer problemId,
+    public Result<IsAdminAndProblem> getDetail(@Min(value = 1, message = ("题目 id 不存在! "))
+                                               @NotNull(message = "题目 id 不存在! ") Integer problemId,
                                                @SessionAttribute("user") User user) {
-        if (problemId == null || problemId <= 0) {
-            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
+
+        // 查看 redis 是否存在, 存在直接返回
+        Problem redisProblem = redisService.get(ProblemKey.getProblem, problemId + "", Problem.class);
+        if (redisProblem != null) {
+            IsAdminAndProblem isAdminAndProblem = new IsAdminAndProblem();
+            isAdminAndProblem.setIsAdmin(user.getIsAdmin());
+            isAdminAndProblem.setProblem(redisProblem);
+            return Result.success(isAdminAndProblem);
         }
 
-        Problem problem = problemService.getProblemByID(problemId);
+        Problem problem = problemService.getProblemById(problemId);
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
+
         IsAdminAndProblem isAdminAndProblem = new IsAdminAndProblem();
         isAdminAndProblem.setIsAdmin(user.getIsAdmin());
         isAdminAndProblem.setProblem(problem);
+        // redis 不存在, 建立缓存
+        redisService.set(ProblemKey.getProblem, problemId + "", problem, RedisCacheTime.DETAIL_PROBLEM_CACHE_TIME);
         return Result.success(isAdminAndProblem);
     }
 
     @RequestMapping("/submit")
-    public Result<Answer> submitCode(@RequestParam("problemId") Integer problemId,
+    public Result<Answer> submitCode(@Min(value = 1, message = ("题目 id 不存在! "))
+                                     @NotNull(message = "题目 id 不存在! ") Integer problemId,
                                      @RequestParam("code") String code,
                                      @SessionAttribute("user") User user) {
-        if (problemId == null || problemId <= 0) {
-            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
-        }
 
-        Problem problem = problemService.getProblemByID(problemId);
+        Problem problem = problemService.getProblemById(problemId);
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
@@ -124,13 +172,11 @@ public class ProblemController {
     }
 
     @RequestMapping("/loadLastSubmitCode")
-    public Result<String> getLastSubmitCode(@RequestParam("problemId") Integer problemId,
+    public Result<String> getLastSubmitCode(@Min(value = 1, message = ("题目 id 不存在! "))
+                                            @NotNull(message = "题目 id 不存在! ") Integer problemId,
                                             @SessionAttribute("user") User user) {
-        if (problemId == null || problemId <= 0) {
-            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
-        }
 
-        Problem problem = problemService.getProblemByID(problemId);
+        Problem problem = problemService.getProblemById(problemId);
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
@@ -142,12 +188,16 @@ public class ProblemController {
     }
 
     @RequestMapping("/loadReferenceAnswer")
-    public Result<String> getReferenceAnswer(@RequestParam("problemId") Integer problemId) {
-        if (problemId == null || problemId <= 0) {
-            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
+    public Result<String> getReferenceAnswer(@Min(value = 1, message = ("题目 id 不存在! "))
+                                             @NotNull(message = "题目 id 不存在! ") Integer problemId) {
+
+        // 查看 redis 是否存在, 存在直接返回
+        Problem redisProblem = redisService.get(ProblemKey.getProblem, problemId + "", Problem.class);
+        if (redisProblem != null) {
+            return Result.success(redisProblem.getReferenceCode());
         }
 
-        Problem problem = problemService.getProblemByID(problemId);
+        Problem problem = problemService.getProblemById(problemId);
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
@@ -157,46 +207,23 @@ public class ProblemController {
     }
 
     @RequestMapping("/addProblem")
-    public Result<Integer> addProblem(@RequestParam("title") String title,
-                                      @RequestParam("level") String level,
-                                      @RequestParam("description") String description,
-                                      @RequestParam("templateCode") String templateCode,
-                                      @RequestParam("testCode") String testCode,
-                                      @RequestParam("referenceCode") String referenceCode) {
-        if (title == null || "".equals(title) ||
-                level == null || "".equals(level)
-                || description == null || "".equals(description.replaceAll(" ", "").replaceAll("\n", ""))
-                || templateCode == null || "".equals(templateCode.replaceAll(" ", "").replaceAll("\n", ""))
-                || testCode == null || "".equals(testCode.replaceAll(" ", "").replaceAll("\n", ""))
-                || referenceCode == null || "".equals(referenceCode.replaceAll(" ", "").replaceAll("\n", ""))
-        ) {
-            return Result.error(ErrorCode.SUBMIT_EXISTS_NULL);
+    public Result<Integer> addProblem(@Validated({GroupSeq.class}) ProblemParam problemParam) {
 
-        }
-
-        Problem problem = new Problem();
-        problem.setTitle(title);
-        problem.setLevel(level);
-        problem.setDescription(description);
-        problem.setTemplateCode(templateCode);
-        problem.setTestCode(testCode);
-        problem.setReferenceCode(referenceCode);
-        Integer isSuccess = problemService.addProblem(problem.getTitle(), problem.getLevel(),
-                problem.getDescription(), problem.getTemplateCode(),
-                problem.getTestCode(), problem.getReferenceCode());
-        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.DATABASE_OPTION_FAIL);
+        Integer isSuccess = problemService.addProblem(problemParam.getTitle(), problemParam.getLevel(),
+                problemParam.getDescription(), problemParam.getTemplateCode(),
+                problemParam.getTestCode(), problemParam.getReferenceCode());
+        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.PROBLEM_ADD_FAIL);
     }
 
     @RequestMapping("/deleteProblem")
-    public Result<Integer> deleteProblem(@RequestParam("problemId") Integer problemId) {
-        if (problemId == null || problemId <= 0) {
-            return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
-        }
-        Problem problem = problemService.getProblemByID(problemId);
+    public Result<Integer> deleteProblem(@Min(value = 1, message = ("题目 id 不存在! "))
+                                         @NotNull(message = "题目 id 不存在! ") Integer problemId) {
+
+        Problem problem = problemService.getProblemById(problemId);
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
-        Integer isSuccess = problemService.deleteProblemByID(problemId);
-        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.DATABASE_OPTION_FAIL);
+        Integer isSuccess = problemService.deleteProblemById(problemId);
+        return isSuccess == 1 ? Result.success(isSuccess) : Result.error(ErrorCode.PROBLEM_DELETE_FAIL);
     }
 }
