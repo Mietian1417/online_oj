@@ -19,8 +19,6 @@ public interface ProblemMapper {
 
     Problem getProblemById(Integer problemId);
 
-    String getReferenceAnswer(Integer problemId);
-
     int addProblem(String title, String level, String description,
                    String templateCode, String testCode, String referenceCode);
 

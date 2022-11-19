@@ -1,0 +1,10 @@
+test1 ok!
+test2 ok!
+test3 fail!
+test4 fail!
+test5 ok!
+test6 fail!
+test7 ok!
+test8 ok!
+test9 fail!
+test10 ok!

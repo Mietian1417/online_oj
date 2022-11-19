@@ -113,9 +113,12 @@ public class ProblemController {
     @RequestMapping("/list")
     public Result<IsAdminAndList> getProblemList(@SessionAttribute("user") User user) {
         // 查看 redis 是否存在, 存在直接返回
-        IsAdminAndList redisISAdminAndList = redisService.get(ProblemsKey.getProblems, "", IsAdminAndList.class);
-        if (redisISAdminAndList != null) {
-            return Result.success(redisISAdminAndList);
+        List<Problem> problems = redisService.get(ProblemsKey.getProblems, "", IsAdminAndList.class);
+        if (problems != null) {
+            IsAdminAndList isAdminAndList = new IsAdminAndList();
+            isAdminAndList.setIsAdmin(user.getIsAdmin());
+            isAdminAndList.setProblemList(problems);
+            return Result.success(isAdminAndList);
         }
 
         List<Problem> problemList = problemService.getProblemList();
@@ -124,7 +127,7 @@ public class ProblemController {
         isAdminAndList.setProblemList(problemList);
 
         // redis 不存在, 建立缓存
-        redisService.set(ProblemsKey.getProblems, "", isAdminAndList, RedisCacheTime.PROBLEMS_CACHE_TIME);
+        redisService.set(ProblemsKey.getProblems, "", problemList, RedisCacheTime.PROBLEMS_CACHE_TIME);
         return Result.success(isAdminAndList);
     }
 
@@ -180,6 +183,7 @@ public class ProblemController {
         if (problem == null) {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
+
         String lastSubmitCode = userService.getLastSubmitCode(problemId, user.getId());
         if (lastSubmitCode == null) {
             return Result.error(ErrorCode.USER_NOT_SUBMIT_ANY_CODE);
@@ -194,6 +198,7 @@ public class ProblemController {
         // 查看 redis 是否存在, 存在直接返回
         Problem redisProblem = redisService.get(ProblemKey.getProblem, problemId + "", Problem.class);
         if (redisProblem != null) {
+            System.out.println("缓存触发!!!!");
             return Result.success(redisProblem.getReferenceCode());
         }
 
@@ -202,8 +207,7 @@ public class ProblemController {
             return Result.error(ErrorCode.PROBLEM_IS_NOT_EXISTS);
         }
 
-        String referenceAnswer = problemService.getReferenceAnswer(problemId);
-        return Result.success(referenceAnswer);
+        return Result.success(problem.getReferenceCode());
     }
 
     @RequestMapping("/addProblem")

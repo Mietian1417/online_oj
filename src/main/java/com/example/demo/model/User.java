@@ -15,5 +15,6 @@ public class User {
     private int id;
     private String username;
     private String password;
+    // 1 为 管理用户, 0 为普通用户
     private int isAdmin;
 }

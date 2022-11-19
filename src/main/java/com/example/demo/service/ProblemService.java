@@ -19,6 +19,7 @@ import java.util.List;
 
 @Service
 public class ProblemService {
+
     @Autowired
     private ProblemMapper problemMapper;
 
@@ -33,12 +34,23 @@ public class ProblemService {
         return problemMapper.getProblemById(problemId);
     }
 
+    /**
+     * 获取到用户代码后, 要拼接测试代码, 再运行整个代码
+     *
+     * @param userId    用户 id
+     * @param problemId 题目 id
+     * @param testCode  测试代码
+     * @param code      用户提交的代码
+     * @return 代码执行结果
+     */
     public Answer submitAndSaveCode(int userId, int problemId, String testCode, String code) {
 
+        // 拼接测试代码
         String finalCode = merge(testCode, code);
 
         if (finalCode == null) {
             Answer answer = new Answer();
+            // 前面约定了 1 表示编译出错
             answer.setStatus(1);
             answer.setReason("提交非法代码! ");
             return answer;
@@ -66,6 +78,7 @@ public class ProblemService {
             return null;
         }
 
+        // 校验代码的合格性
         if (checkMethodIsExist(submitCode)) {
             String str = submitCode.substring(0, pos);
             return str + testCode + "\n}";
@@ -76,15 +89,11 @@ public class ProblemService {
     private boolean checkMethodIsExist(String submitCode) {
         String test = submitCode.replaceAll(" ", "");
         String test1 = test.replaceAll("\n", "");
-        if (test1.charAt(test1.length() - 1) == '}' &&
-                test1.charAt(test1.length() - 2) == '}') {
+        if (test1.charAt(test1.length() - 1) == '}'
+                && test1.charAt(test1.length() - 2) == '}') {
             return true;
         }
         return false;
-    }
-
-    public String getReferenceAnswer(Integer problemId) {
-        return problemMapper.getReferenceAnswer(problemId);
     }
 
     public Integer addProblem(String title, String level, String description, String templateCode, String testCode, String referenceCode) {
