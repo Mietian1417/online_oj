@@ -13,6 +13,10 @@ import javax.servlet.http.HttpSession;
  * Date: 2022-05-06
  * Time: 19:47
  */
+
+/**
+ * 拦截规则, 没有 session 的用户拒绝访问
+ */
 public class LoginHandlerInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {

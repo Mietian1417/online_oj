@@ -15,4 +15,5 @@ public class UserSubmitCode {
     private int userId;
     private int problemId;
     private String submitCode;
+    private int isPass;
 }

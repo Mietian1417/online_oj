@@ -156,9 +156,9 @@
                     location.assign("problem_list.html");
                     return;
                 }
-                if (result.data.isAdmin === 1){
+                if (result.data.isAdmin === 1) {
                     let addProblemA = document.createElement('a');
-                    addProblemA.href="add_problem.html";
+                    addProblemA.href = "add_problem.html";
                     addProblemA.innerHTML = '新增题目';
                     addProblemA.target = '_blank';
                     addProblemA.className = 'navbar-brand font-weight-bold';
@@ -169,7 +169,7 @@
                     parentNode.insertBefore(addProblemA, nextNode);
 
                     let deleteProblemA = document.createElement('a');
-                    deleteProblemA.href="delete_problem.html";
+                    deleteProblemA.href = "delete_problem.html";
                     deleteProblemA.innerHTML = '删除题目';
                     deleteProblemA.target = '_blank';
                     deleteProblemA.className = 'navbar-brand font-weight-bold';
@@ -217,10 +217,11 @@
                 success: function (result) {
                     let problemResult = document.querySelector("#problemResult");
                     if (result.code === 0) {
-                        if (result.data.status !== 0) {
-                            problemResult.innerHTML = result.data.reason;
-                        } else {
+                        // status 约定答案状态, 0 正常输出, 1 编译异常, 2 运行异常
+                        if (result.data.status === 0) {
                             problemResult.innerHTML = result.data.stdout;
+                        } else {
+                            problemResult.innerHTML = result.data.reason;
                         }
                     } else {
                         alert(result.message);
@@ -252,9 +253,9 @@
             url: "online_oj/loadReferenceAnswer" + location.search,
             type: "GET",
             success: function (result) {
-                if (result.code !== 0){
+                if (result.code !== 0) {
                     alert(result.message);
-                }else{
+                } else {
                     editor.setValue(result.data);
                 }
             }

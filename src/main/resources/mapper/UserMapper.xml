@@ -13,27 +13,37 @@
         <id column="user_id" property="userId"></id>
         <result column="problem_id" property="problemId"></result>
         <result column="submit_code" property="submitCode"></result>
+        <result column="is_pass" property="isPass"></result>
     </resultMap>
 
     <insert id="addUser">
         insert into user(id, username, password) values (null, #{username}, #{password})
     </insert>
 
+
+    <!--    读取用户提交的代码-->
+    <select id="selectByName" resultMap="BaseMap1">
+        select id, username, password, is_admin from user where username = #{username}
+    </select>
+
     <!--    保存用户提交的代码-->
     <insert id="saveUserSubmitCode">
         replace  into user_submit_code(user_id, problem_id, submit_code)
         values
         (#{userId}, #{problemId}, #{submitCode})
-
     </insert>
 
-    <!--    读取用户提交的代码-->
-
-    <select id="selectByName" resultMap="BaseMap1">
-        select id, username, password, is_admin from user where username = #{username}
-    </select>
-
+    <!-- 查看用户指定题目的状态 -->
     <select id="getLastSubmitCode" resultType="java.lang.String">
         select submit_code from user_submit_code where user_id = #{userId} and problem_id = #{problemId}
     </select>
+
+    <!-- 修改用户指定题目的状态 -->
+    <select id="isPass" resultType="java.lang.Integer">
+        select is_pass from user_submit_code where user_id = #{userId} and problem_id = #{problemId}
+    </select>
+
+    <update id="setPass">
+        update user_submit_code set is_pass = 1 where user_id = #{userId} and problem_id = #{problemId}
+    </update>
 </mapper>

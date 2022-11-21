@@ -1,17 +1,17 @@
 package com.example.demo;
 
 
-import com.example.demo.util.ValidatorUtil;
-import lombok.AllArgsConstructor;
+import com.example.demo.model.Problem;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.validation.annotation.Validated;
+
+import java.util.ArrayList;
 
 @SpringBootTest
 class DemoApplicationTests {
 
     @Test
     void test() {
+
     }
 }

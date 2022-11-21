@@ -19,4 +19,6 @@ public class Problem {
     private String templateCode;
     private String testCode;
     private String referenceCode;
+
+    private int isPass;
 }

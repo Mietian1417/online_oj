@@ -29,10 +29,11 @@ public class ErrorCode {
     public static final ErrorCode USER_NOT_SUBMIT_ANY_CODE = new ErrorCode(-1, "该用户尚未提交过任何可执行的代码! ");
 
 
-    public static final ErrorCode PROBLEM_ADD_FAIL = new ErrorCode(-1, "题目添加失败!");
+    public static final ErrorCode PROBLEM_ADD_FAIL = new ErrorCode(-1, "题目添加失败! ");
 
-    public static final ErrorCode PROBLEM_DELETE_FAIL = new ErrorCode(-1, "题目删除失败!");;
+    public static final ErrorCode PROBLEM_DELETE_FAIL = new ErrorCode(-1, "题目删除失败! ");
 
+    public static final ErrorCode SERVER_EXECUTE_CODE_FAIL = new ErrorCode(-1, "服务器执行代码失败! ");
 
 
     public static final ErrorCode BIND_ERROR = new ErrorCode(500101, "参数校验异常: %s");

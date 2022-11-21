@@ -20,4 +20,8 @@ public interface UserMapper {
     int saveUserSubmitCode(int userId, int problemId, String submitCode);
 
     String getLastSubmitCode(Integer problemId, int userId);
+
+    Integer isPass(Integer userId, Integer problemId);
+
+    int setPass(Integer userId, Integer problemId);
 }

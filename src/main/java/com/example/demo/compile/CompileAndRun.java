@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.compile;
 
 import com.example.demo.util.FileUtil;
 
@@ -8,6 +8,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,44 +23,46 @@ import java.util.TimerTask;
 
 /**
  * 这个类来创建子进程, 来完成编译和运行, 并返回运行结果的状态
- *      1 表示编译, 2 表示运行, 以此来防止 运行阶段的运行代码介入到编译阶段
+ * 1 表示编译, 2 表示运行, 以此来防止 运行阶段的运行代码介入到编译阶段
  */
 public class CompileAndRun {
 
     /**
      * 该方法来完成编译和运行, 并返回运行结果的状态
-     * @param status 状态, 是编译还是运行, 约定 1 是编译, 2 是运行
+     *
+     * @param status  状态, 是编译还是运行, 约定 1 是编译, 2 是运行
      * @param command 执行命令(编译命令或执行命令)
-     * @param stderr 出现错误, 将错误写入该文件
-     * @param stdout 输出内容, 将输出的内容写入该文件
+     * @param stderr  出现错误, 将错误写入该文件
+     * @param stdout  输出内容, 将输出的内容写入该文件
      * @return 返回代码最后的执行状态
      */
-    public static void run(int status, String command, String stderr, String stdout){
+    public static void run(int status, String command, String stderr, String stdout) {
         try {
-            Runtime runtime =  Runtime.getRuntime();
+            // 获取 JVM 的执行环境, 并创建一个新的进程执行命令
+            Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(command);
 
             // 运行阶段代码运行时间过长
-            if(status == 2){
+            if (status == 2) {
                 // 如果代码运行时间过长, 认为代码存在死循环, 无线递归等问题, 终止运行
-                Timer timer = new Timer();
+                ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
+                        System.out.println("!!!!!");
                         FileUtil.writeFile(stderr, "代码运行超时, 请检查代码! ");
                         process.destroy();
                     }
-                }, 3000);
+                }, 3, TimeUnit.SECONDS);
             }
 
-
             // 3. 获取到标准错误, 并写到指定文件中
-            if(stderr != null){
+            if (stderr != null) {
                 InputStream stderrFrom = process.getErrorStream();
                 OutputStream stderrTo = new FileOutputStream(stderr, true);
-                while(true){
+                while (true) {
                     int ch = stderrFrom.read();
-                    if(ch == -1){
+                    if (ch == -1) {
                         break;
                     }
                     stderrTo.write(ch);
@@ -66,12 +72,12 @@ public class CompileAndRun {
             }
 
             // 2. 获取到标准输出, 并写到指定文件中
-            if(stdout != null){
+            if (stdout != null) {
                 InputStream stdoutFrom = process.getInputStream();
                 OutputStream stdoutTo = new FileOutputStream(stdout);
-                while (true){
+                while (true) {
                     int ch = stdoutFrom.read();
-                    if(ch == -1){
+                    if (ch == -1) {
                         break;
                     }
                     stdoutTo.write(ch);

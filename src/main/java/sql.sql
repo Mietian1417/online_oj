@@ -22,6 +22,7 @@ create table user_submit_code(
     user_id int,
     problem_id int,
     submit_code varchar(4096),
+    is_pass int default 0,
     primary key(user_id, problem_id)
 );
 

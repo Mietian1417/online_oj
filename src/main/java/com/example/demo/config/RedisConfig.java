@@ -11,7 +11,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 
 /**
- * redis key 序列化的配置
+ * redis 序列化的配置
  */
 @Configuration
 public class RedisConfig {

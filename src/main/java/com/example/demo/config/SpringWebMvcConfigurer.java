@@ -12,8 +12,16 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * Time: 19:53
  */
 
+/**
+ * springboot 全局配置
+ */
 @Configuration
 public class SpringWebMvcConfigurer implements WebMvcConfigurer {
+
+    /**
+     * 拦截哪些资源和页面
+     * @param registry 帮助配置映射截取程序列表
+     */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new LoginHandlerInterceptor())
@@ -26,7 +34,6 @@ public class SpringWebMvcConfigurer implements WebMvcConfigurer {
                 .excludePathPatterns("/**/online_oj_login.html")
                 .excludePathPatterns("/**/online_oj_register.html")
                 .excludePathPatterns("/**/login")
-                .excludePathPatterns("/**/register")
-                .excludePathPatterns("/**/test");
+                .excludePathPatterns("/**/register");
     }
 }

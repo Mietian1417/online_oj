@@ -1,7 +1,7 @@
 public class Solution {
     
     public int powerOfTwo(int n) {
-        return           0;  
+        return 0;            
     }
     
 public static void main(String[] args) {

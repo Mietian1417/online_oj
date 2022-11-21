@@ -1,4 +1,4 @@
-package com.example.demo.service;
+package com.example.demo.compile;
 
 import com.example.demo.util.FileUtil;
 import com.example.demo.model.Answer;
@@ -86,7 +86,7 @@ public class Task {
 
         /*
             java -classpath %s %s
-            运行名利, 第一个参数为 字节码所在的目录, 第二个参数为 字节码文件的文件名(只是文件名, 不包括目录和后缀)
+            运行命令, 第一个参数为 字节码所在的目录, 第二个参数为 字节码文件的文件名(只是文件名, 不包括目录和后缀)
          */
         String runCommand = String.format("java -classpath %s %s", WORD_DIR, CLASS);
         CompileAndRun.run(2, runCommand, RUN_STDERR, STDOUT);

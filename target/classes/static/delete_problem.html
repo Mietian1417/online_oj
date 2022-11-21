@@ -134,13 +134,14 @@
 
     function getProblemList(problems) {
         let parent = document.querySelector("#problem_list");
+        let id = 1;
 
         for (let problem of problems) {
             let tr = document.createElement("tr");
             parent.appendChild(tr);
 
             let tdId = document.createElement("td");
-            tdId.innerHTML = problem.id;
+            tdId.innerHTML = id;
             tr.appendChild(tdId);
 
             let tdTitle = document.createElement("td");
@@ -174,6 +175,7 @@
                 )
             };
             tr.appendChild(deleteButton);
+            id++;
         }
     }
 
