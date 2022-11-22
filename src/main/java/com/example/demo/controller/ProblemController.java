@@ -69,13 +69,7 @@ public class ProblemController {
         }
     }
 
-    /**
-     * 用户注册
-     *
-     * @param userParam 参数校验的类
-     * @return 注册状态
-     * @Validated({GroupSeq.class}) 开启校验类的校验顺序(GroupSeq 为定义校验顺序的接口)
-     */
+
     @RequestMapping("/register")
     public Result<String> register(@Validated({GroupSeq.class}) UserParam userParam) {
 
@@ -90,14 +84,7 @@ public class ProblemController {
         return Result.success("");
     }
 
-    /**
-     * 用户登录
-     *
-     * @param userParam 参数校验的类
-     * @param request   客户端的信息
-     * @return 登录状态
-     * @Validated({GroupSeq.class}) 开启校验类的校验顺序(GroupSeq 为定义校验顺序的接口)
-     */
+
     @RequestMapping("/login")
     public Result<String> login(@Validated({GroupSeq.class}) UserParam userParam,
                                 HttpServletRequest request) {
@@ -115,13 +102,6 @@ public class ProblemController {
         return Result.success("");
     }
 
-    /**
-     * 用户注销
-     *
-     * @param request  客户端的信息
-     * @param response 服务器的信息
-     * @throws IOException 重定向方法抛出的异常(找不到对应的页面)
-     */
     @RequestMapping("/logout")
     public void logout(HttpServletRequest request,
                        HttpServletResponse response) throws IOException {
@@ -132,13 +112,7 @@ public class ProblemController {
         response.sendRedirect("/online_oj_login.html");
     }
 
-    /**
-     * 展示用户列表
-     *
-     * @param user 用户信息
-     * @return 返回 vo(题目列表 + 是否为管理用户)
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/list")
     public Result<IsAdminAndList> getProblemList(@SessionAttribute("user") User user) {
         // 查看 redis 是否存在, 存在直接返回
@@ -169,17 +143,7 @@ public class ProblemController {
         return Result.success(isAdminAndList);
     }
 
-    /**
-     * 展示题目详情页
-     *
-     * @param problemId 题目 id
-     * @param user      用户信息
-     * @return 返回 vo(题目详情 + 是否为管理用户)
-     * @Validated 注解
-     * @Min(value = 1, message = ("题目 id 不存在! "))   int 类型最小校验, value 为最小值, message 为报错信息
-     * @NotNull(message = "题目 id 不存在! ")    引用字段的非空校验, message 为报错信息
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/detail")
     public Result<IsAdminAndProblem> getDetail(@Min(value = 1, message = ("题目 id 不存在! "))
                                                @NotNull(message = "题目 id 不存在! ") Integer problemId,
@@ -207,18 +171,7 @@ public class ProblemController {
         return Result.success(isAdminAndProblem);
     }
 
-    /**
-     * 执行用户提交的代码
-     *
-     * @param problemId 题目 id
-     * @param code      用户提交的代码
-     * @param user      用户信息
-     * @return 返回执行结果
-     * @Validated 注解
-     * @Min(value = 1, message = ("题目 id 不存在! "))   int 类型最小校验, value 为最小值, message 为报错信息
-     * @NotNull(message = "题目 id 不存在! ")    引用字段的非空校验, message 为报错信息
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/submit")
     public Result<Answer> submitCode(@Min(value = 1, message = ("题目 id 不存在! "))
                                      @NotNull(message = "题目 id 不存在! ") Integer problemId,
@@ -246,17 +199,7 @@ public class ProblemController {
         return Result.success(answer);
     }
 
-    /**
-     * 加载用户上一次执行的代码
-     *
-     * @param problemId 题目 id
-     * @param user      用户信息
-     * @return 返回上次该用户提交的代码
-     * @Validated 注解
-     * @Min(value = 1, message = ("题目 id 不存在! "))   int 类型最小校验, value 为最小值, message 为报错信息
-     * @NotNull(message = "题目 id 不存在! ")    引用字段的非空校验, message 为报错信息
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/loadLastSubmitCode")
     public Result<String> getLastSubmitCode(@Min(value = 1, message = ("题目 id 不存在! "))
                                             @NotNull(message = "题目 id 不存在! ") Integer problemId,
@@ -274,15 +217,7 @@ public class ProblemController {
         return Result.success(lastSubmitCode);
     }
 
-    /**
-     * 查看参考答案
-     *
-     * @param problemId 题目 id
-     * @return 返回题目的参考答案
-     * @Validated 注解
-     * @Min(value = 1, message = ("题目 id 不存在! "))   int 类型最小校验, value 为最小值, message 为报错信息
-     * @NotNull(message = "题目 id 不存在! ")    引用字段的非空校验, message 为报错信息
-     */
+
     @RequestMapping("/loadReferenceAnswer")
     public Result<String> getReferenceAnswer(@Min(value = 1, message = ("题目 id 不存在! "))
                                              @NotNull(message = "题目 id 不存在! ") Integer problemId) {
@@ -301,15 +236,7 @@ public class ProblemController {
         return Result.success(problem.getReferenceCode());
     }
 
-    /**
-     * 添加题目
-     *
-     * @param problemParam 题目 id
-     * @param user         用户信息
-     * @return 返回添加状态
-     * @Validated({GroupSeq.class}) 开启校验类的校验顺序(GroupSeq 为定义校验顺序的接口)
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/addProblem")
     public Result<Integer> addProblem(@Validated({GroupSeq.class}) ProblemParam problemParam,
                                       @SessionAttribute("user") User user) {
@@ -327,17 +254,7 @@ public class ProblemController {
         return Result.success(isSuccess);
     }
 
-    /**
-     * 删除题目
-     *
-     * @param problemId 题目 id
-     * @param user      用户信息
-     * @return 返回删除状态
-     * @Validated 注解
-     * @Min(value = 1, message = ("题目 id 不存在! "))   int 类型最小校验, value 为最小值, message 为报错信息
-     * @NotNull(message = "题目 id 不存在! ")    引用字段的非空校验, message 为报错信息
-     * @SessionAttribute("user") 获取指定字段的用户信息
-     */
+
     @RequestMapping("/deleteProblem")
     public Result<Integer> deleteProblem(@Min(value = 1, message = ("题目 id 不存在! "))
                                          @NotNull(message = "题目 id 不存在! ") Integer problemId,
