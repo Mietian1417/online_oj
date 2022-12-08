@@ -19,6 +19,10 @@ import javax.validation.constraints.NotEmpty;
  */
 @Data
 public class ProblemParam {
+
+    // 用来接收返回自增 id
+    private int id;
+
     @NotEmpty(message = "题目标题不能为空! ", groups = {GroupSeq.First.class})
     private String title;
 

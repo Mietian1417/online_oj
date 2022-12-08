@@ -1,16 +1,18 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.UserMapper;
-import com.example.demo.model.Answer;
-import com.example.demo.model.Problem;
 import com.example.demo.model.User;
 import com.example.demo.redis.ProblemsKey;
 import com.example.demo.redis.RedisCacheTime;
-import com.example.demo.redis.RedisService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created with IntelliJ IDEA.
@@ -21,28 +23,26 @@ import java.util.List;
  */
 
 @Service
+@Validated
 public class UserService {
 
     @Autowired
     private UserMapper userMapper;
 
-    @Autowired
-    private RedisService redisService;
-
     public User selectByName(String username) {
         return userMapper.selectByName(username);
     }
 
-    public int addUser(String username, String password) {
-        return userMapper.addUser(username, password);
+    public int addUser(User user) {
+        return userMapper.addUser(user);
     }
 
     public int saveUserSubmitCode(int userId, int problemId, String submitCode) {
         return userMapper.saveUserSubmitCode(userId, problemId, submitCode);
     }
 
-    public String getLastSubmitCode(Integer problemID, int userID) {
-        return userMapper.getLastSubmitCode(problemID, userID);
+    public String getLastSubmitCode(Integer problemId, int userId) {
+        return userMapper.getLastSubmitCode(problemId, userId);
     }
 
     public Integer isPass(int userId, int problemId) {
@@ -53,6 +53,13 @@ public class UserService {
         return userMapper.setPass(id, problemId);
     }
 
+    /**
+     * 返回 0 表示 没有全部通过, 1 表示全部通过, -1 表示 sql 执行出错
+     * @param stdout
+     * @param userId
+     * @param problemId
+     * @return
+     */
     public int updateUserOfProblemIsPass(String stdout, int userId, Integer problemId) {
         // 去除空格, 统计通过个数
         String isOk = stdout.replaceAll("\\s*", "");
@@ -63,20 +70,17 @@ public class UserService {
             }
         }
         if (passTestCount == 10) {
+            // 存数据库
             Integer integer = setPass(userId, problemId);
             if (integer == null || integer == 0) {
                 return -1;
             }
-            // 更新缓存
-            List<Problem> problems = redisService.get(ProblemsKey.getProblems, userId + "", List.class);
-            for (Problem curProblem : problems) {
-                if (curProblem.getId() == problemId) {
-                    curProblem.setIsPass(1);
-                    redisService.set(ProblemsKey.getProblems, userId + "", problems, RedisCacheTime.PROBLEMS_CACHE_TIME);
-                    return 0;
-                }
-            }
+            return 1;
         }
         return 0;
+    }
+
+    public List<User> getAllUsers() {
+        return userMapper.getAllUsers();
     }
 }

@@ -18,4 +18,7 @@ public class RedisCacheTime {
 
     // 具体题目 -> 30分钟
     public static final int DETAIL_PROBLEM_CACHE_TIME = 30 * 60;
+
+    // 永不过期
+    public static final int NERVER_EXPIRES = -1;
 }

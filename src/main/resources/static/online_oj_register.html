@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <title>我的 OJ 平台</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
+    <link rel="shortcut icon" href="img/favicon.ico">
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css-login/bootstrap.min.css">
 
@@ -63,7 +63,7 @@
     function login() {
         let username = $("#exampleInputEmail1").val();
         let password = $("#exampleInputPassword1").val();
-        $.getJSON("/online_oj/register",
+        $.getJSON("/register",
             {
                 "username": username,
                 "password": password

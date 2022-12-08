@@ -13,4 +13,11 @@ public class ProblemsKey extends BasePrefix{
         super(prefix);
     }
     public static ProblemsKey getProblems = new ProblemsKey("problems");
+    public static ProblemsKey getProblemsCount = new ProblemsKey("problemsCount");
+    public static ProblemsKey getProblemsOfPagesCount = new ProblemsKey("pagesCount");
+    public static ProblemsKey getProblemsOfPage = new ProblemsKey("problemListOfPage");
+
+    public static ProblemsKey getCurPageProblemsIsPassOfUser(int page, int userId){
+        return  new ProblemsKey("pageProblemsIsPassOfUser:" + "page:" + page + ",userId:" + userId);
+    }
 }

@@ -29,7 +29,7 @@
     </select>
 
     <!--    添加题目-->
-    <insert id="addProblem">
+    <insert id="addProblem" useGeneratedKeys="true" keyProperty="id" parameterType="com.example.demo.param.ProblemParam">
         insert into oj_question(id, title, level, description, template_code, test_code, reference_code)
         values
         (null, #{title}, #{level}, #{description}, #{templateCode}, #{testCode}, #{referenceCode})

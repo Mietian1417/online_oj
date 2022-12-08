@@ -5,6 +5,7 @@ import com.example.demo.model.Answer;
 import com.example.demo.model.Question;
 import com.example.demo.dao.ProblemMapper;
 import com.example.demo.model.Problem;
+import com.example.demo.param.ProblemParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -97,8 +98,8 @@ public class ProblemService {
         return false;
     }
 
-    public Integer addProblem(String title, String level, String description, String templateCode, String testCode, String referenceCode) {
-        return problemMapper.addProblem(title, level, description, templateCode, testCode, referenceCode);
+    public int addProblem(ProblemParam problemParam) {
+        return problemMapper.addProblem(problemParam);
     }
 
     public Integer deleteProblemById(Integer problemId) {

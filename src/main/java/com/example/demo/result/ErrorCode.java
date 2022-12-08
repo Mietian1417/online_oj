@@ -35,6 +35,9 @@ public class ErrorCode {
 
     public static final ErrorCode SERVER_EXECUTE_CODE_FAIL = new ErrorCode(-1, "服务器执行代码失败! ");
 
+    public static final ErrorCode VERIFYCODECODE_ERROR = new ErrorCode(-2, "验证码校验失败, 请重新输入! ");
+
+
 
     public static final ErrorCode BIND_ERROR = new ErrorCode(500101, "参数校验异常: %s");
 

@@ -1,6 +1,7 @@
 package com.example.demo.dao;
 
 import com.example.demo.model.Problem;
+import com.example.demo.param.ProblemParam;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -19,8 +20,7 @@ public interface ProblemMapper {
 
     Problem getProblemById(Integer problemId);
 
-    int addProblem(String title, String level, String description,
-                   String templateCode, String testCode, String referenceCode);
+    int addProblem(ProblemParam problemParam);
 
     Integer deleteProblemById(Integer problemId);
 }

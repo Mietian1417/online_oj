@@ -1,21 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8">
     <title>我的 OJ 平台</title>
     <meta name="description" content="Charcoal is a free Bootstrap 4 UI kit build by @attacomsian at Wired Dots."/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="img/favicon.ico">
     <!--Bootstrap 4-->
     <link rel="stylesheet" href="css/bootstrap.min.css">
-
 </head>
 <style>
     .space-1{
         width: 90%;
-    }
-
-    .space-2{
-        width: 80%;
     }
 
     .deleteButton{
@@ -41,7 +38,7 @@
 <nav class="navbar navbar-expand-md navbar-dark fixed-top" id="parentA">
     <a class="navbar-brand font-weight-bold" id="child1" href="#">在线OJ - 删除题目</a>
     <span class="space-1"></span>
-    <a class="navbar-brand font-weight-bold" href="/online_oj/logout" id="child2">注销</a>
+    <a class="navbar-brand font-weight-bold" href="/logout" id="child2">注销</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#topMenu"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -124,10 +121,10 @@
 <script>
     function getList() {
         $.ajax({
-            url: "/online_oj/list",
+            url: "/online_oj/getAllProblems",
             type: "GET",
             success: function (result) {
-                getProblemList(result.data.problemList);
+                getProblemList(result.data);
             }
         })
     }
@@ -159,11 +156,12 @@
             let deleteButton = document.createElement('button');
             deleteButton.innerHTML = '删除';
             deleteButton.className = 'deleteButton';
-            deleteButton.id = problem.id; // 根据这个来删除指定的问题
+            deleteButton.id = id + ""; // 根据这个来删除指定的问题
             deleteButton.onclick = function deleteProblem(){
                 $.getJSON("/online_oj/deleteProblem",
                     {
-                        "problemId": problem.id
+                        "problemId": problem.id,
+                        "problemPosition": deleteButton.id
                     },
                     function (result) {
                         if (result.code !== 0){

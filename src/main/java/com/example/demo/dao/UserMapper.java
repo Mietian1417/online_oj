@@ -3,6 +3,8 @@ package com.example.demo.dao;
 import com.example.demo.model.User;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 /**
  * Created with IntelliJ IDEA.
  * Description:
@@ -15,7 +17,7 @@ import org.apache.ibatis.annotations.Mapper;
 public interface UserMapper {
     User selectByName(String username);
 
-    int addUser(String username, String password);
+    int addUser(User user);
 
     int saveUserSubmitCode(int userId, int problemId, String submitCode);
 
@@ -24,4 +26,6 @@ public interface UserMapper {
     Integer isPass(Integer userId, Integer problemId);
 
     int setPass(Integer userId, Integer problemId);
+
+    List<User> getAllUsers();
 }

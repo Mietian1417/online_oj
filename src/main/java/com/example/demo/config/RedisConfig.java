@@ -31,7 +31,9 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, RedisSerializer<String> redisKeySerializer, RedisSerializer<Object> redisValueSerializer) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory,
+                                                       RedisSerializer<String> redisKeySerializer,
+                                                       RedisSerializer<Object> redisValueSerializer) {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(factory);
         //设置Key的序列化采用StringRedisSerializer

@@ -16,7 +16,7 @@
         <result column="is_pass" property="isPass"></result>
     </resultMap>
 
-    <insert id="addUser">
+    <insert id="addUser" useGeneratedKeys="true" keyProperty="id" parameterType="com.example.demo.model.User">
         insert into user(id, username, password) values (null, #{username}, #{password})
     </insert>
 
@@ -41,6 +41,10 @@
     <!-- 修改用户指定题目的状态 -->
     <select id="isPass" resultType="java.lang.Integer">
         select is_pass from user_submit_code where user_id = #{userId} and problem_id = #{problemId}
+    </select>
+
+    <select id="getAllUsers" resultMap="BaseMap1">
+        select id, username, password, is_admin from user;
     </select>
 
     <update id="setPass">

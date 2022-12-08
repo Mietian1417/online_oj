@@ -1,6 +1,7 @@
-package com.example.demo.redis;
+package com.example.demo.service;
 
 import com.alibaba.fastjson.JSON;
+import com.example.demo.redis.PrefixKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -60,6 +61,22 @@ public class RedisService {
     public <T> Boolean exists(PrefixKey prefix, String key) {
         String realKey = prefix.getPrefixKey() + key;
         return redisTemplate.hasKey(realKey);
+    }
+
+    /**
+     * 增加值
+     */
+    public <T> Long incr(PrefixKey prefix, String key) {
+        String realKey = prefix.getPrefixKey() + key;
+        return redisTemplate.opsForValue().increment(realKey);
+    }
+
+    /**
+     * 减少值
+     */
+    public <T> Long decr(PrefixKey prefix, String key) {
+        String realKey = prefix.getPrefixKey() + key;
+        return redisTemplate.opsForValue().decrement(realKey);
     }
 
 

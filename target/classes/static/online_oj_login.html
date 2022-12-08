@@ -7,6 +7,8 @@
     <title>我的 OJ 平台</title>
     <meta name="description" content="Charcoal is a free Bootstrap 4 UI kit build by @attacomsian at Wired Dots."/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="img/favicon.ico">
+
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="css-login/bootstrap.min.css">
 
@@ -15,8 +17,26 @@
 
     <!-- Custom Styles -->
     <link rel="stylesheet" type="text/css" href="css-login/styles.css">
-
 </head>
+
+<style>
+    .verificationCode {
+        display: inline-block;
+        height: 40px;
+        margin: auto 0;
+    }
+
+    #verificationCodeInput {
+        display: inline-block;
+    }
+
+    #verificationCodeSpan {
+        display: flex;
+        justify-content: space-between;
+        justify-items: center;
+    }
+
+</style>
 
 <body>
 
@@ -40,20 +60,23 @@
                 <!-- Loging form -->
                 <form>
                     <div class="form-group">
-                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="用户名">
-
+                        <input type="text" class="form-control" id="exampleInputEmail1" placeholder="用户名"
+                               autofocus="autofocus">
                     </div>
                     <div class="form-group">
                         <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
                     </div>
 
+                    <div class="form-group" id="verificationCodeSpan">
+                        <input id="verificationCodeInput" type="text" class="form-control"
+                               placeholder="点击图片更换验证码" style="width: 60%">
+                        <img src="" onclick="updateVerificationCode()" alt="" style="cursor: pointer">
+                    </div>
+
                     <br>
                     <button type="button" class="btn btn-lg btn-block btn-success" onclick="login()">Sign in</button>
                 </form>
-                <!-- End Loging form -->
-
-                <br><br>
-                <label class="register"><a href="online_oj_register.html">注 册<a></label>
+                <label class="register"><a href="online_oj_register.html">注 册</label>
 
             </div>
         </div>
@@ -66,20 +89,39 @@
     function login() {
         let username = $("#exampleInputEmail1").val();
         let password = $("#exampleInputPassword1").val();
-        $.getJSON("/online_oj/login",
+        let code = $("#verificationCodeInput");
+        $.getJSON("/login",
             {
                 "username": username,
-                "password": password
+                "password": password,
+                "code": code.val()
             },
             function (result) {
                 if (result.code === 0) {
-                    location.assign("problem_list.html");
+                    location.assign("problem_list.html?startPage=1");
+                } else if (result.code === -2) {
+                    alert(result.message);
+                    updateVerificationCode();
+                    code.val('');
+                    code.focus();
                 } else {
                     alert(result.message);
+                    updateVerificationCode();
                 }
             }
         )
     }
+
+    /**
+     * 触发请求 url 必须不同, 否则浏览器不会发送完全相同的请求,
+     */
+    function updateVerificationCode() {
+        let img = document.querySelector(".form-group img");
+        img.src = "/login/verificationCode?time=" + new Date();
+        img.className = "verificationCode";
+    }
+
+    updateVerificationCode();
 </script>
 
 
