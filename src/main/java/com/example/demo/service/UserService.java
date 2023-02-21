@@ -1,7 +1,9 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.UserMapper;
+import com.example.demo.model.Problem;
 import com.example.demo.model.User;
+import com.example.demo.redis.ProblemKey;
 import com.example.demo.redis.ProblemsKey;
 import com.example.demo.redis.RedisCacheTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,9 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RedisService redisService;
 
     public User selectByName(String username) {
         return userMapper.selectByName(username);
@@ -61,7 +66,20 @@ public class UserService {
      * @return
      */
     public int updateUserOfProblemIsPass(String stdout, int userId, Integer problemId) {
-        // 去除空格, 统计通过个数
+
+        // 得到题目测试用例的个数
+        Problem problem = redisService.get(ProblemKey.getProblem, problemId + "", Problem.class);
+        String testCode = problem.getTestCode();
+        testCode = testCode.replaceAll("\\s*", "");
+        int exampleCount = 0;
+        for (int i = 0; i < testCode.length() - 1; i++) {
+            if(testCode.charAt(i) == 'i' && testCode.charAt(i + 1) == 'f') {
+                exampleCount++;
+                i++;
+            }
+        }
+
+        // 统计题目通过的用例数
         String isOk = stdout.replaceAll("\\s*", "");
         int passTestCount = 0;
         for (int i = 0; i < isOk.length(); i++) {
@@ -69,7 +87,9 @@ public class UserService {
                 passTestCount++;
             }
         }
-        if (passTestCount == 10) {
+
+        // 个数比对
+        if (passTestCount == exampleCount) {
             // 存数据库
             Integer integer = setPass(userId, problemId);
             if (integer == null || integer == 0) {
@@ -82,5 +102,9 @@ public class UserService {
 
     public List<User> getAllUsers() {
         return userMapper.getAllUsers();
+    }
+
+    public Integer deleteUserSubmitCode(int userId, Integer problemId) {
+        return userMapper.deleteUserSubmitCode(userId, problemId);
     }
 }

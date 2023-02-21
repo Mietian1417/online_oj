@@ -10,12 +10,12 @@ import com.example.demo.result.ErrorCode;
 import com.example.demo.result.Result;
 import com.example.demo.service.RedisService;
 import com.example.demo.service.UserService;
+import com.example.demo.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -41,7 +41,7 @@ public class RegisterController {
     private RedisService redisService;
 
     @Autowired
-    private ExecutorService executorService ;
+    private ExecutorService executorService;
 
     @RequestMapping("/register")
     public Result<String> register(@Validated({GroupSeq.class}) UserParam userParam) {
@@ -55,7 +55,9 @@ public class RegisterController {
 
         User addUser = new User();
         addUser.setUsername(userParam.getUsername());
-        addUser.setPassword(userParam.getPassword());
+        // 密码加密
+        String passwordToMad5 = MD5Util.getMD5(userParam.getPassword());
+        addUser.setPassword(passwordToMad5);
 
         int isSuccess = userService.addUser(addUser);
         if (isSuccess == 0) {

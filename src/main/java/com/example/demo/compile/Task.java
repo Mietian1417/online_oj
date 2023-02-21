@@ -80,6 +80,10 @@ public class Task {
         if (!"".equals(compileError)) {
             // 前面约定了 1 为 编译错误
             answer.setStatus(1);
+            int pos = compileError.indexOf("Solution");
+            if (pos != -1) {
+                compileError = compileError.substring(pos);
+            }
             answer.setReason(compileError);
             return answer;
         }

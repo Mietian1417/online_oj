@@ -33,6 +33,11 @@
         (#{userId}, #{problemId}, #{submitCode})
     </insert>
 
+    <!--    删除用户提交的代码以及通过状态-->
+    <delete id="deleteUserSubmitCode">
+        delete from user_submit_code where user_id = #{userId} and problem_id = #{problemId}
+    </delete>
+
     <!-- 查看用户指定题目的状态 -->
     <select id="getLastSubmitCode" resultType="java.lang.String">
         select submit_code from user_submit_code where user_id = #{userId} and problem_id = #{problemId}

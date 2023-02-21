@@ -6,6 +6,7 @@ import com.example.demo.model.Question;
 import com.example.demo.dao.ProblemMapper;
 import com.example.demo.model.Problem;
 import com.example.demo.param.ProblemParam;
+import com.example.demo.redis.ProblemsKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -66,7 +67,17 @@ public class ProblemService {
         Answer answer = task.compileAndRun(question);
         if (answer.getStatus() == 0) {
             // 当用户编译运行没有问题时, 保存(更新)用户当前提交的代码
+            // 如果是更新操作, 那么便会覆盖上一条, 这里先记录该题目的通过状态
+            Integer isPass = userService.isPass(userId, problemId);
+            if (isPass == null) {
+                isPass = 0;
+            }
+            // 更新提交的代码, 由于数据库的 is_pass 字段默认为 0 , 这个时候便会覆盖通过状态
             userService.saveUserSubmitCode(userId, problemId, code);
+            // 查看题目状态是否为已通过, 如果是, 则再写回通过状态
+            if (isPass == 1) {
+                userService.setPass(userId, problemId);
+            }
         }
         return answer;
     }
@@ -89,13 +100,9 @@ public class ProblemService {
     }
 
     private boolean checkMethodIsExist(String submitCode) {
-        String test = submitCode.replaceAll(" ", "");
-        String test1 = test.replaceAll("\n", "");
-        if (test1.charAt(test1.length() - 1) == '}'
-                && test1.charAt(test1.length() - 2) == '}') {
-            return true;
-        }
-        return false;
+        String test = submitCode.replaceAll("\\s*", "");
+        return test.charAt(test.length() - 1) == '}'
+                && test.charAt(test.length() - 2) == '}';
     }
 
     public int addProblem(ProblemParam problemParam) {

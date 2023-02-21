@@ -21,6 +21,8 @@ public interface UserMapper {
 
     int saveUserSubmitCode(int userId, int problemId, String submitCode);
 
+    Integer deleteUserSubmitCode(int userId, int problemId);
+
     String getLastSubmitCode(Integer problemId, int userId);
 
     Integer isPass(Integer userId, Integer problemId);
@@ -29,3 +31,4 @@ public interface UserMapper {
 
     List<User> getAllUsers();
 }
+

@@ -1,0 +1,37 @@
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:9: 错误: 需要')'
+        System.out.println(test1 ok!);
+                                ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:9: 错误: 非法的表达式开始
+        System.out.println(test1 ok!);
+                                    ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:9: 错误: 不是语句
+        System.out.println(test1 ok!);
+                                   ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:11: 错误: 需要')'
+        System.out.println(test1 fail!);
+                                ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:11: 错误: 非法的表达式开始
+        System.out.println(test1 fail!);
+                                      ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:11: 错误: 不是语句
+        System.out.println(test1 fail!);
+                                     ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:15: 错误: 需要')'
+        System.out.println(test2 ok!);
+                                ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:15: 错误: 非法的表达式开始
+        System.out.println(test2 ok!);
+                                    ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:15: 错误: 不是语句
+        System.out.println(test2 ok!);
+                                   ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:17: 错误: 需要')'
+        System.out.println(test2 fail!);
+                                ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:17: 错误: 非法的表达式开始
+        System.out.println(test2 fail!);
+                                      ^
+.\tmp\77c8d7c7-1254-4c0e-aa83-3fe8f98acf2b\Solution.java:17: 错误: 不是语句
+        System.out.println(test2 fail!);
+                                     ^
+12 个错误

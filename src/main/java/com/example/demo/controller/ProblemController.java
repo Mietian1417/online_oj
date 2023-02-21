@@ -9,10 +9,10 @@ import com.example.demo.redis.ProblemKey;
 import com.example.demo.redis.ProblemsKey;
 import com.example.demo.redis.RedisCacheTime;
 import com.example.demo.redis.UserKey;
-import com.example.demo.service.RedisService;
 import com.example.demo.result.ErrorCode;
 import com.example.demo.result.Result;
 import com.example.demo.service.ProblemService;
+import com.example.demo.service.RedisService;
 import com.example.demo.service.UserService;
 import com.example.demo.vo.ViewProblems;
 import com.example.demo.vo.viewProbelm;
@@ -29,7 +29,6 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,13 +62,13 @@ public class ProblemController {
      */
     @PostConstruct
     public void loadProblemsToRedis() {
+        // 缓存题目列表页上的展示题目(id, 标题, 难度)
         List<Problem> problemList = problemService.getProblemList();
         for (Problem simpleProblem : problemList) {
             Problem problem = problemService.getProblemById(simpleProblem.getId());
             redisService.set(ProblemKey.getProblem, problem.getId() + "", problem, RedisCacheTime.DETAIL_PROBLEM_CACHE_TIME);
         }
         redisService.set(ProblemsKey.getProblems, "", problemList, RedisCacheTime.NERVER_EXPIRES);
-
 
         // 每个用户要遍历所有题目的通过情况, 并且这些题目还要分页缓存
         List<User> userList = userService.getAllUsers();
@@ -204,11 +203,12 @@ public class ProblemController {
         // 用户提交代码通过全部用例, 标记题目为通过状态
         String stdout = answer.getStdout();
         if (stdout != null) {
+            // 全部通过返回 1, 未全部通过返回 0, SQL 出错 返回 -1
             int status = userService.updateUserOfProblemIsPass(stdout, user.getId(), problemId);
             if (status == -1) {
                 return Result.error(ErrorCode.SERVER_EXECUTE_CODE_FAIL);
             }
-            // 全部通过, 更新该用户题目通过状态的缓存,
+            // 全部通过, 更新该用户题目通过状态的缓存
             if (status == 1) {
                 List<Integer> isPassList = redisService.get(ProblemsKey.getCurPageProblemsIsPassOfUser(page, user.getId()), "", List.class);
                 for (int i = 0; i < isPassList.size(); i++) {
@@ -217,6 +217,7 @@ public class ProblemController {
                         break;
                     }
                 }
+                userService.setPass(user.getId(), position);
                 redisService.set(ProblemsKey.getCurPageProblemsIsPassOfUser(page, user.getId()), "", isPassList, RedisCacheTime.NERVER_EXPIRES);
             }
         }
@@ -336,12 +337,12 @@ public class ProblemController {
             }
         }
 
-        problem.setDescription(problem.getDescription());
+        problem.setDescription(problemParam.getDescription());
         problem.setTestCode(problemParam.getTestCode());
         problem.setReferenceCode(problemParam.getReferenceCode());
         problem.setTemplateCode(problemParam.getTemplateCode());
         // 将该题目添加到 redis 题目缓存
-        redisService.set(ProblemKey.getProblem, problemParam.getId() + "", problem, RedisCacheTime.DETAIL_PROBLEM_CACHE_TIME);
+        redisService.set(ProblemKey.getProblem, problem.getId() + "", problem, RedisCacheTime.DETAIL_PROBLEM_CACHE_TIME);
         // 返回最后一页的页数
         return Result.success(lastPage);
     }
@@ -367,6 +368,14 @@ public class ProblemController {
         if (isSuccess == null || isSuccess == 0) {
             return Result.error(ErrorCode.PROBLEM_DELETE_FAIL);
         }
+
+        // 删除所有用户在这题的提交代码和通过状态
+        List<User> userList = redisService.get(UserKey.getAllUsers, "", List.class);
+        // 这里可能有的用户并没有做过这道题, 查询
+        for (User user : userList) {
+            userService.deleteUserSubmitCode(user.getId(), problemId);
+        }
+
 
         // 从 redis 中删除该题目的缓存(无论缓存是否存在, 该方法都不会报错, 只是返回一个是否删除成功的状态)
         redisService.del(ProblemKey.getProblem, problem.getId() + "");
@@ -405,7 +414,6 @@ public class ProblemController {
         }
 
         // 更新所有用户该页以及该页后的所有题目通过状态的缓存
-        List<User> userList = redisService.get(UserKey.getAllUsers, "", List.class);
         List<Problem> problemList = redisService.get(ProblemsKey.getProblems, "", List.class);
         // 得到需要更新的题目列表
         problemList = problemList.subList((deleteProblemOfPage - 1) * 10, problemList.size());

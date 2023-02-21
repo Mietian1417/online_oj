@@ -186,9 +186,12 @@
 
     function getDetail(problem) {
         let parentDiv = document.querySelector("#problemDesc");
+        let urlParams = new URLSearchParams(window.location.search);
+        let page = urlParams.get("startPage");
+        let position = urlParams.get("problemRank");
 
         let h3 = document.createElement("h3");
-        h3.innerHTML = problem.id + ". " + problem.title + "-" + problem.level;
+        h3.innerHTML = (page - 1) * 10 + (position * 1) + ". " + problem.title + "-" + problem.level;
         parentDiv.appendChild(h3);
 
         let pre = document.createElement("pre");
@@ -203,9 +206,8 @@
         editor.setValue(problem.templateCode);
 
         let submitButton = document.querySelector("#submitButton");
-        let urlParams = new URLSearchParams(window.location.search);
-        let page = urlParams.get("startPage");
-        let position = urlParams.get("problemRank");
+
+
         submitButton.onclick = function () {
             let body = {
                 problemId: problem.id,

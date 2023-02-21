@@ -47,7 +47,6 @@ public class CompileAndRun {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        System.out.println("!!!!!");
                         FileUtil.writeFile(stderr, "代码运行超时, 请检查代码! ");
                         process.destroy();
                     }

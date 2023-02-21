@@ -1,0 +1,11 @@
+.\tmp\5609a58f-7c89-4033-8b4a-52410a056d55\Solution.java:3: 错误: 找不到符号
+        return a + b;
+               ^
+  符号:   变量 a
+  位置: 类 Solution
+.\tmp\5609a58f-7c89-4033-8b4a-52410a056d55\Solution.java:3: 错误: 找不到符号
+        return a + b;
+                   ^
+  符号:   变量 b
+  位置: 类 Solution
+2 个错误
