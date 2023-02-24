@@ -6,7 +6,6 @@ import com.example.demo.redis.UserKey;
 import com.example.demo.result.ErrorCode;
 import com.example.demo.result.Result;
 import com.example.demo.service.RedisService;
-import com.example.demo.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,17 +50,15 @@ public class LoginController {
             return Result.error(ErrorCode.VERIFYCODECODE_ERROR);
         }
 
-        // 用户名密码验证
+        // 用户名密码验证(密码前端已经进行 md5 加密)
         List<User> userList = redisService.get(UserKey.getAllUsers, "", List.class);
         for (User user : userList) {
-            // 对密码进行加密后再与缓存中已经加密的密码进行比对
-            String passwordToMd5 = MD5Util.getMD5(password);
-           if(user.getUsername().equals(username) && user.getPassword().equals(passwordToMd5)){
+           if(user.getUsername().equals(username) && user.getPassword().equals(password)){
                // 保存用户信息
                User userSession = new User();
                userSession.setId(user.getId());
                userSession.setUsername(username);
-               userSession.setPassword(passwordToMd5);
+               userSession.setPassword(password);
                userSession.setIsAdmin(user.getIsAdmin());
                session.setAttribute("user", userSession);
                return Result.success("");

@@ -47,13 +47,17 @@ public class CompileAndRun {
                 timer.schedule(new TimerTask() {
                     @Override
                     public void run() {
-                        FileUtil.writeFile(stderr, "代码运行超时, 请检查代码! ");
-                        process.destroy();
+                        // 如果等待 3 秒后再执行还存活, 说明出现了无线递归或死循环等情况
+                        // 如果等待 3 秒后再执行未存活, 说明代码已经执行完了
+                        if (process.isAlive()) {
+                            FileUtil.writeFile(stderr, "代码运行超时, 请检查代码! ");
+                            process.destroy();
+                        }
                     }
                 }, 3, TimeUnit.SECONDS);
             }
 
-            // 3. 获取到标准错误, 并写到指定文件中
+            // 1. 获取到标准错误, 并写到指定文件中
             if (stderr != null) {
                 InputStream stderrFrom = process.getErrorStream();
                 OutputStream stderrTo = new FileOutputStream(stderr, true);
@@ -64,12 +68,13 @@ public class CompileAndRun {
                     }
                     stderrTo.write(ch);
                 }
-                stderrFrom.close();
                 stderrTo.close();
+                stderrFrom.close();
             }
 
             // 2. 获取到标准输出, 并写到指定文件中
             if (stdout != null) {
+                // 获取 process 子进程运行命令的输出流, 若命令还未运行完, 则阻塞等待
                 InputStream stdoutFrom = process.getInputStream();
                 OutputStream stdoutTo = new FileOutputStream(stdout);
                 while (true) {
@@ -79,9 +84,10 @@ public class CompileAndRun {
                     }
                     stdoutTo.write(ch);
                 }
-                stdoutFrom.close();
                 stdoutTo.close();
+                stdoutFrom.close();
             }
+            process.destroy();
         } catch (IOException e) {
             e.printStackTrace();
         }
